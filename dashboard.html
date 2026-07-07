@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Site Verification -->
+    <meta name="google-site-verification" content="XX4hPwv3MLlExDokvccOsb_7M6vrn_qYyE4S0lgyYmw" />
+    
+    <!-- Full SEO Tags -->
+    <meta name="description" content="Dashboard for Smart Parking System - View real-time parking analytics, occupancy rates, and revenue.">
+    <meta name="keywords" content="smart parking dashboard, parking analytics, occupancy rate, parking revenue management">
+    <meta name="author" content="Smart Parking">
+    <meta name="robots" content="index, follow">
+    
+    <!-- GEO Tags -->
+    <meta name="geo.region" content="IN-AP">
+    <meta name="geo.placename" content="Andhra Pradesh">
+    <meta name="geo.position" content="15.9129;79.7400">
+    <meta name="ICBM" content="15.9129, 79.7400">
+
+    <title>CommuniPark Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="s.css">
+    <link rel="stylesheet" href="ra.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-parking"></i> CommuniPark
+            </a>
+            <div class="nav-links">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a>
+                <a href="Reservations.html"><i class="fas fa-calendar-check"></i> Reservations</a>
+                <a href="Profile.html"><i class="fas fa-user"></i> Profile</a>
+                <a href="admin.html"><i class="fas fa-user-shield"></i> Admin</a>
+                <a href="exit.html"><i class="fas fa-door-open"></i> Exit Gate</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section">
+        <div class="dashboard">
+            <h2>Parking Analytics Dashboard</h2>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Current Occupancy Rate</h3>
+                    <p id="occupancy-rate">0%</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Peak Hour Traffic</h3>
+                    <p id="peak-hour">N/A</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Stay Duration</h3>
+                    <p id="average-duration">0h</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Today's Revenue</h3>
+                    <p id="daily-revenue">$0</p>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Hourly Parking Trend</h3>
+                    <canvas id="hourlyTrendChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Vehicle Type Distribution</h3>
+                    <canvas id="vehicleTypeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container full-width">
+                <h3>Parking Spot Details</h3>
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Spot ID</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>User Type</th>
+                            <th>Apartment</th>
+                            <th>Duration</th>
+                            <th>Vehicle</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parking-details">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    <script src="dash.js"></script>
+</body>
+</html>

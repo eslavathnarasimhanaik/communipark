@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CommuniPay Secure Checkout</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="s.css">
+    <link rel="stylesheet" href="ra.css">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-card: rgba(17, 24, 39, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --accent: #4f46e5;
+            --accent-hover: #4338ca;
+            --success: #10b981;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .checkout-container {
+            max-width: 950px;
+            width: 100%;
+            margin: auto;
+            padding: 2rem 1rem;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 2rem;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .payment-methods-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .order-summary-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            height: fit-content;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Tabs styling */
+        .tab-nav {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+        }
+
+        .row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Netbanking list */
+        .bank-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .bank-option {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-glass);
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .bank-option:hover {
+            border-color: var(--accent);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .bank-option.selected {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.08);
+            color: var(--success);
+        }
+
+        /* Pay Button */
+        .btn-pay {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+            border-radius: 12px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45);
+        }
+
+        /* Processing Overlay */
+        #processing-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 15, 25, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #f1f5f9;
+        }
+
+        .spinner {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            animation: spin 1.5s linear infinite;
+        }
+
+        /* OTP Modal */
+        #otp-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .otp-card {
+            background: #1e293b;
+            border: 2px solid #334155;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border-radius: 20px;
+            max-width: 400px;
+            width: 100%;
+            padding: 2.25rem;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .otp-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .otp-box {
+            width: 45px;
+            height: 48px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 2px solid #334155;
+            border-radius: 8px;
+            color: #fff;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .otp-box:focus {
+            border-color: var(--accent);
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header style="padding: 1.5rem 2rem; background: rgba(15, 23, 42, 0.4); border-bottom: 1px solid var(--border-glass);">
+        <div style="max-width: 1200px; margin: auto; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="background: linear-gradient(135deg, var(--accent), #818cf8); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 1.25rem; color: #fff;">
+                    CP
+                </div>
+                <span style="font-weight: 800; font-size: 1.35rem; color: #fff; letter-spacing: 0.5px;">CommuniPay</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
+                <i class="fas fa-lock" style="color: var(--success);"></i> 256-bit Secure Checkout
+            </div>
+        </div>
+    </header>
+
+    <main style="flex: 1; display: flex; align-items: center;">
+        <div class="checkout-container">
+            <!-- Payment Methods Form -->
+            <section class="payment-methods-card">
+                <nav class="tab-nav">
+                    <button class="tab-btn active" onclick="switchTab('card')">
+                        <i class="fas fa-credit-card"></i> Card
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('upi')">
+                        <i class="fas fa-mobile-alt"></i> UPI
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('netbanking')">
+                        <i class="fas fa-university"></i> Bank
+                    </button>
+                </nav>
+
+                <!-- Cards Form -->
+                <div id="card-tab" class="tab-content active">
+                    <form onsubmit="handlePaymentSubmit(event, 'card')">
+                        <div class="form-group">
+                            <label>Cardholder Name</label>
+                            <input type="text" required class="form-input" placeholder="e.g. John Doe" id="card-name">
+                        </div>
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" required class="form-input" placeholder="4111 2222 3333 4444" maxlength="19" id="card-number" oninput="formatCardNumber(this)">
+                        </div>
+                        <div class="row-grid">
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="text" required class="form-input" placeholder="MM/YY" maxlength="5" id="card-expiry" oninput="formatExpiry(this)">
+                            </div>
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="password" required class="form-input" placeholder="***" maxlength="3" id="card-cvv">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-pay">
+                            <i class="fas fa-shield-alt"></i> Pay Securely
+                        </button>
+                    </form>
+                </div>
+
+                <!-- UPI Form -->
+                <div id="upi-tab" class="tab-content">
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); text-align: left; margin-bottom: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                        Select UPI Option
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.5rem; background: rgba(15, 23, 42, 0.4); padding: 4px; border-radius: 10px; border: 1px solid var(--border-glass);">
+                        <button type="button" class="tab-btn active" id="upi-qr-toggle" onclick="switchUpiSubTab('qr')" style="padding: 8px; font-size: 0.85rem; width: 100%;">
+                            <i class="fas fa-qrcode"></i> Scan QR Code
+                        </button>
+                        <button type="button" class="tab-btn" id="upi-id-toggle" onclick="switchUpiSubTab('id')" style="padding: 8px; font-size: 0.85rem; width: 100%;">
+                            <i class="fas fa-mobile-alt"></i> Pay via App/ID
+                        </button>
+                    </div>
+
+                    <!-- Sub-tab 1: QR Code -->
+                    <div id="upi-qr-subcontent" style="text-align: center; padding: 0.5rem 0;">
+                        <div style="background: white; padding: 12px; border-radius: 16px; width: fit-content; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 2px solid var(--accent);">
+                            <img id="upi-qr-image" src="" alt="UPI QR Code" style="display: block; width: 160px; height: 160px;">
+                        </div>
+                        <div style="margin-top: 1rem; font-size: 0.82rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                            <span class="pulse-indicator" style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; display: inline-block;"></span>
+                            Scan QR with PhonePe, GPay, Paytm or BHIM
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.75rem; max-width: 320px; margin: 0.5rem auto 1.5rem auto; line-height: 1.4;">
+                            The QR code is configured for your reservation details and total amount.
+                        </p>
+                        <button onclick="handleSimulateUpiQrPay()" class="btn-pay" style="background: linear-gradient(135deg, var(--success) 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                            <i class="fas fa-check-circle"></i> Click to Verify QR Payment
+                        </button>
+                    </div>
+
+                    <!-- Sub-tab 2: UPI ID & Deep Linking -->
+                    <div id="upi-id-subcontent" style="display: none;">
+                        <div class="bank-grid" style="margin-bottom: 1.5rem;">
+                            <div class="bank-option selected" id="upi-phonepe" onclick="selectUpiApp(this, 'PhonePe', '@ybl')">
+                                <i class="fas fa-mobile-alt" style="color: #a855f7;"></i> PhonePe
+                            </div>
+                            <div class="bank-option" id="upi-gpay" onclick="selectUpiApp(this, 'GPay', '@okaxis')">
+                                <i class="fab fa-google" style="color: #4285f4;"></i> Google Pay
+                            </div>
+                            <div class="bank-option" id="upi-paytm" onclick="selectUpiApp(this, 'Paytm', '@paytm')">
+                                <i class="fas fa-wallet" style="color: #00baf2;"></i> Paytm
+                            </div>
+                            <div class="bank-option" id="upi-bhim" onclick="selectUpiApp(this, 'BHIM', '@upi')">
+                                <i class="fas fa-university" style="color: #e21d24;"></i> BHIM
+                            </div>
+                        </div>
+
+                        <!-- Direct Deep Link Button for Mobile -->
+                        <div style="margin-bottom: 1.5rem; text-align: center;">
+                            <a id="upi-deep-link-btn" href="#" class="btn-pay" style="background: linear-gradient(135deg, #673ab7 0%, #512da8 100%); box-shadow: 0 4px 15px rgba(103, 58, 183, 0.3); text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100%;">
+                                <i class="fas fa-external-link-alt"></i> Open PhonePe / UPI App
+                            </a>
+                            <p style="color: var(--text-secondary); font-size: 0.72rem; margin-top: 0.5rem; line-height: 1.3;">
+                                (Tap this button if you are paying directly from your mobile phone)
+                            </p>
+                        </div>
+
+                        <div style="height: 1px; background: var(--border-glass); margin: 1.5rem 0; position: relative; text-align: center;">
+                            <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #111827; padding: 0 10px; font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">OR PAY VIA UPI ID</span>
+                        </div>
+
+                        <form onsubmit="handlePaymentSubmit(event, 'upi')">
+                            <div class="form-group">
+                                <label id="upi-input-label">Enter PhonePe UPI Address</label>
+                                <div style="display: flex; align-items: center; background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border-glass); border-radius: 10px; overflow: hidden; padding-right: 14px;">
+                                    <input type="text" required class="form-input" placeholder="e.g. 9876543210" id="upi-username" style="border: none; background: transparent; flex: 1; font-family: monospace;">
+                                    <span id="upi-handle" style="font-weight: 700; color: var(--text-secondary); font-family: monospace; user-select: none;">@ybl</span>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-pay">
+                                <i class="fas fa-shield-alt"></i> Send Payment Request
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Netbanking Grid -->
+                <div id="netbanking-tab" class="tab-content">
+                    <form onsubmit="handlePaymentSubmit(event, 'netbanking')">
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); text-align: left; margin-bottom: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                            Select Popular Banks
+                        </div>
+                        <div class="bank-grid" style="margin-bottom: 1.5rem;">
+                            <div class="bank-option" onclick="selectBank(this, 'State Bank of India')">
+                                <i class="fas fa-university" style="color: #00a2e8;"></i> SBI
+                            </div>
+                            <div class="bank-option" onclick="selectBank(this, 'HDFC Bank')">
+                                <i class="fas fa-university" style="color: #003366;"></i> HDFC
+                            </div>
+                            <div class="bank-option" onclick="selectBank(this, 'ICICI Bank')">
+                                <i class="fas fa-university" style="color: #ff6600;"></i> ICICI
+                            </div>
+                            <div class="bank-option" onclick="selectBank(this, 'Axis Bank')">
+                                <i class="fas fa-university" style="color: #990033;"></i> AXIS
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Or Choose Other Bank</label>
+                            <select class="form-input" id="nb-select">
+                                <option value="">-- Choose Bank --</option>
+                                <option value="Kotak Bank">Kotak Mahindra Bank</option>
+                                <option value="Punjab National Bank">Punjab National Bank</option>
+                                <option value="Bank of Baroda">Bank of Baroda</option>
+                                <option value="Yes Bank">Yes Bank</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-pay">
+                            <i class="fas fa-shield-alt"></i> Proceed to Netbanking
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Booking Order Summary -->
+            <aside class="order-summary-card">
+                <h3 style="margin-top: 0; font-weight: 700; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px; text-align: left; color: #fff;">
+                    Order Summary
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 0.85rem; text-align: left; font-size: 0.9rem;">
+                    <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Reservation ID</span><span style="font-weight: 600;" id="sum-res-id">-</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Slot Location</span><span style="font-weight: 600;" id="sum-slot">-</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Vehicle Number</span><span style="font-weight: 700; color: #fff;" id="sum-vehicle">-</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Duration</span><span style="font-weight: 600;" id="sum-duration">-</span></div>
+                    
+                    <div style="height: 1px; background: var(--border-glass); margin: 0.5rem 0;"></div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">Total Amount</span>
+                        <span style="font-size: 1.4rem; font-weight: 800; color: var(--success);" id="sum-amount">₹0</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Secure Processing Loader Overlay -->
+    <div id="processing-overlay">
+        <i class="fas fa-circle-notch spinner"></i>
+        <h3 id="loader-title" style="margin-bottom: 0.5rem; font-weight: 700;">Securing Payment Line...</h3>
+        <p id="loader-desc" style="color: var(--text-secondary); font-size: 0.9rem; max-width: 250px; text-align: center; line-height: 1.4;">Connecting to your bank servers securely</p>
+    </div>
+
+
+
+    <footer style="text-align: center; padding: 1.5rem 0; border-top: 1px solid var(--border-glass); color: var(--text-secondary); font-size: 0.8rem; background: rgba(15, 23, 42, 0.2);">
+        <p>&copy; 2025 CommuniPay Gateways | Secure transaction powered by CommuniPark</p>
+    </footer>
+
+    <script>
+        const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : `${window.location.origin}/api`;
+        let resId = '';
+        let token = '';
+        let selectedNB = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            resId = params.get('resId');
+            token = params.get('token');
+
+            if (!resId || !token) {
+                alert('Session parameters missing.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            fetchReservationDetails();
+        });
+
+        let upiPayUri = '';
+
+        async function fetchReservationDetails() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/reservations`);
+                const all = await response.json();
+                const reservation = all.find(r => r.id == resId);
+                if (!reservation) {
+                    alert('Reservation not found');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                // If reservation is already paid, redirect straight to payment.html success screen
+                if (reservation.paymentStatus === 'PAID') {
+                    window.location.href = `payment.html?resId=${resId}&payment_success=true`;
+                    return;
+                }
+
+                const amount = Math.round(reservation.revenue);
+                document.getElementById('sum-res-id').textContent = '#' + reservation.id;
+                document.getElementById('sum-slot').textContent = 'Slot #' + (reservation.parkingSpot ? reservation.parkingSpot.id : 'N/A');
+                document.getElementById('sum-vehicle').textContent = reservation.vehicleNumber || 'N/A';
+                document.getElementById('sum-duration').textContent = reservation.duration + ' hr(s)';
+                document.getElementById('sum-amount').textContent = '₹' + amount;
+
+                // Setup UPI payment URI
+                const merchantUpi = "narasimha591@axl";
+                const note = `CommuniPark Res #${reservation.id}`;
+                upiPayUri = `upi://pay?pa=${merchantUpi}&pn=CommuniPark&am=${amount}.00&cu=INR&tn=${encodeURIComponent(note)}`;
+
+                // Generate QR Code image source
+                const qrImg = document.getElementById('upi-qr-image');
+                if (qrImg) {
+                    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiPayUri)}`;
+                }
+
+                // Setup mobile deep link button
+                const deepLinkBtn = document.getElementById('upi-deep-link-btn');
+                if (deepLinkBtn) {
+                    deepLinkBtn.href = upiPayUri;
+                }
+            } catch (e) {
+                console.error('Error fetching reservation details:', e);
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            const activeBtn = Array.from(document.querySelectorAll('.tab-nav button')).find(btn => btn.innerText.toLowerCase().includes(tabName));
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const content = document.getElementById(`${tabName}-tab`);
+            if (content) content.classList.add('active');
+        }
+
+        function selectBank(element, bankName) {
+            document.querySelectorAll('.bank-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedNB = bankName;
+            document.getElementById('nb-select').value = '';
+        }
+
+        let selectedUpiApp = 'PhonePe';
+        let selectedUpiHandle = '@ybl';
+
+        function selectUpiApp(element, appName, handle) {
+            document.querySelectorAll('#upi-tab .bank-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedUpiApp = appName;
+            selectedUpiHandle = handle;
+            
+            // Update labels
+            document.getElementById('upi-input-label').textContent = `Enter ${appName} UPI Address`;
+            document.getElementById('upi-handle').textContent = handle;
+            
+            // Update placeholder
+            const usernameInput = document.getElementById('upi-username');
+            if (appName === 'PhonePe') {
+                usernameInput.placeholder = 'e.g. 9876543210';
+            } else if (appName === 'GPay') {
+                usernameInput.placeholder = 'e.g. johndoe';
+            } else if (appName === 'Paytm') {
+                usernameInput.placeholder = 'e.g. 9876543210';
+            } else {
+                usernameInput.placeholder = 'e.g. username';
+            }
+
+            // Update submit button text and form help tip
+            const payBtn = document.querySelector('#upi-id-subcontent .btn-pay');
+            if (payBtn) {
+                payBtn.innerHTML = `<i class="fas fa-shield-alt"></i> Pay Securely via ${appName}`;
+            }
+
+            // Also update the Deep Link button text
+            const deepLinkBtn = document.getElementById('upi-deep-link-btn');
+            if (deepLinkBtn) {
+                deepLinkBtn.innerHTML = `<i class="fas fa-external-link-alt"></i> Open ${appName} / UPI App`;
+            }
+
+            const helpTip = document.querySelector('#upi-id-subcontent p');
+            if (helpTip) {
+                helpTip.innerHTML = `💡 A request will be sent to your ${appName} app. Open it and approve to complete payment.`;
+            }
+        }
+
+        function switchUpiSubTab(subTab) {
+            const qrBtn = document.getElementById('upi-qr-toggle');
+            const idBtn = document.getElementById('upi-id-toggle');
+            const qrContent = document.getElementById('upi-qr-subcontent');
+            const idContent = document.getElementById('upi-id-subcontent');
+
+            if (subTab === 'qr') {
+                qrBtn.classList.add('active');
+                idBtn.classList.remove('active');
+                qrContent.style.display = 'block';
+                idContent.style.display = 'none';
+            } else {
+                qrBtn.classList.remove('active');
+                idBtn.classList.add('active');
+                qrContent.style.display = 'none';
+                idContent.style.display = 'block';
+            }
+        }
+
+        function handleSimulateUpiQrPay() {
+            const overlay = document.getElementById('processing-overlay');
+            overlay.style.display = 'flex';
+            document.getElementById('loader-title').textContent = 'Confirming QR Scan Payment...';
+            document.getElementById('loader-desc').textContent = 'Connecting to UPI bank portal...';
+
+            setTimeout(() => {
+                window.location.href = `bank_gateway.html?resId=${resId}&token=${token}&method=upi&bank=${selectedUpiApp}`;
+            }, 1000);
+        }
+
+        // Input formatting helpers
+        function formatCardNumber(input) {
+            let val = input.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formatted = [];
+            for (let i = 0; i < val.length; i += 4) {
+                formatted.push(val.substr(i, 4));
+            }
+            input.value = formatted.join(' ');
+        }
+
+        function formatExpiry(input) {
+            let val = input.value.replace(/\//g, '').replace(/[^0-9]/gi, '');
+            if (val.length >= 2) {
+                input.value = val.substr(0, 2) + '/' + val.substr(2, 2);
+            } else {
+                input.value = val;
+            }
+        }
+
+        // OTP inputs movement
+        function moveFocus(current, nextId) {
+            if (current.value.length === 1) {
+                const next = document.getElementById(nextId);
+                if (next) next.focus();
+            }
+        }
+
+        // Payment Submit and OTP modal triggering
+        function handlePaymentSubmit(event, paymentMethod) {
+            event.preventDefault();
+
+            let bankName = 'Secure Gateway';
+            if (paymentMethod === 'netbanking') {
+                bankName = selectedNB || document.getElementById('nb-select').value || 'Bank';
+            } else if (paymentMethod === 'upi') {
+                bankName = selectedUpiApp;
+            } else if (paymentMethod === 'card') {
+                bankName = 'Card SecurePay';
+            }
+
+            const overlay = document.getElementById('processing-overlay');
+            const title = document.getElementById('loader-title');
+            const desc = document.getElementById('loader-desc');
+            overlay.style.display = 'flex';
+
+            let steps = [
+                { title: 'Securing Payment Line...', desc: 'Verifying network encryption protocols...' },
+                { title: 'Connecting to Bank...', desc: `Redirecting you securely to ${bankName} portal...` }
+            ];
+
+            let stepIdx = 0;
+            const stepInterval = setInterval(() => {
+                stepIdx++;
+                if (stepIdx < steps.length) {
+                    title.textContent = steps[stepIdx].title;
+                    desc.textContent = steps[stepIdx].desc;
+                } else {
+                    clearInterval(stepInterval);
+                    window.location.href = `bank_gateway.html?resId=${resId}&token=${token}&method=${paymentMethod}&bank=${encodeURIComponent(bankName)}`;
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

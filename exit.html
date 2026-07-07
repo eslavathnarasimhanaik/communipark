@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CommuniPark - Exit Gate Simulator</title>
+    <meta name="description" content="Simulate the physical exit gate barrier at CommuniPark. Enter your paid 6-digit exit code to lift the barrier and release your parking spot.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="s.css">
+    <style>
+        .exit-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        /* Physical Gate Visual */
+        .gate-simulation {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 16px;
+            border: 1px solid var(--border-glass);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 20px;
+        }
+
+        /* Post supporting the arm */
+        .gate-post {
+            width: 40px;
+            height: 90px;
+            background: linear-gradient(135deg, #475569, #1e293b);
+            border: 2px solid #64748b;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gate-pivot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #f59e0b;
+            border: 2px solid #d97706;
+            box-shadow: 0 0 8px #f59e0b;
+        }
+
+        /* Barrier Arm */
+        .gate-arm {
+            width: 260px;
+            height: 12px;
+            background: repeating-linear-gradient(
+                90deg,
+                #ef4444,
+                #ef4444 20px,
+                #ffffff 20px,
+                #ffffff 40px
+            );
+            border: 1px solid #dc2626;
+            position: absolute;
+            bottom: 74px;
+            left: calc(20% + 15px);
+            transform-origin: 0% 50%;
+            transform: rotate(0deg);
+            transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 5;
+            border-radius: 4px;
+        }
+
+        .gate-arm.open {
+            transform: rotate(-90deg);
+        }
+
+        /* LED status strip on the arm */
+        .gate-led-strip {
+            position: absolute;
+            top: 4px;
+            left: 30px;
+            right: 10px;
+            height: 4px;
+            background: #ef4444;
+            border-radius: 2px;
+            box-shadow: 0 0 10px #ef4444;
+            transition: background 0.5s, box-shadow 0.5s;
+        }
+
+        .gate-arm.open .gate-led-strip {
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        /* Stop / Go sign indicator */
+        .gate-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.15);
+            border: 3px solid #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ef4444;
+            font-size: 1.25rem;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            transition: all 0.5s ease;
+        }
+
+        .gate-indicator.go {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+            color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Ground line */
+        .gate-road {
+            width: 90%;
+            height: 4px;
+            background: #334155;
+            border-radius: 2px;
+            position: absolute;
+            bottom: 0;
+            left: 5%;
+        }
+
+        /* Code input group styling */
+        .code-input-group {
+            margin-bottom: 2rem;
+        }
+
+        .code-input {
+            width: 100%;
+            max-width: 320px;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid var(--border-glass);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 2.25rem;
+            font-family: 'Inter', monospace;
+            font-weight: 800;
+            letter-spacing: 8px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .code-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.25);
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        .btn-gate {
+            background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            padding: 16px 36px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-gate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45);
+        }
+
+        .btn-gate:disabled {
+            background: rgba(107, 114, 128, 0.5);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Vehicles Details Card on Exit Success */
+        .exit-vehicle-details {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            text-align: left;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-parking"></i> CommuniPark
+            </a>
+            <div class="nav-links">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a>
+                <a href="Reservations.html"><i class="fas fa-calendar-check"></i> Reservations</a>
+                <a href="Profile.html"><i class="fas fa-user"></i> Profile</a>
+                <a href="admin.html"><i class="fas fa-user-shield"></i> Admin</a>
+                <a href="exit.html" class="active"><i class="fas fa-door-open"></i> Exit Gate</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="max-width: 600px; margin: 0 auto; padding: 2rem 1rem;">
+        <div class="header" style="text-align: center; margin-bottom: 2rem;">
+            <h1>🚪 Exit Gate Barrier</h1>
+            <p style="color: var(--text-secondary); margin-top: 0.5rem;">Enter your paid 6-digit Exit Code to open the gate and release your parking spot.</p>
+        </div>
+
+        <div class="exit-card">
+            <!-- Physical Gate Graphic -->
+            <div class="gate-simulation">
+                <!-- Status text display overlay -->
+                <div id="gate-status-text" style="position: absolute; top: 20px; left: 20px; font-weight: 800; font-size: 1rem; color: #ef4444; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block; animation: pulse 1s infinite;"></span>
+                    Gate Locked
+                </div>
+
+                <div class="gate-indicator" id="gateIndicator">
+                    <i class="fas fa-hand-paper" id="indicatorIcon"></i>
+                </div>
+
+                <div class="gate-post">
+                    <div class="gate-pivot"></div>
+                </div>
+
+                <div class="gate-arm" id="gateArm">
+                    <div class="gate-led-strip"></div>
+                </div>
+
+                <div class="gate-road"></div>
+            </div>
+
+            <!-- Gate Code Entry Form -->
+            <div id="gate-control-panel">
+                <form id="exit-code-form">
+                    <div class="code-input-group">
+                        <label for="exitCode" style="display: block; font-size: 0.85rem; text-transform: uppercase; font-weight: 700; color: var(--text-secondary); letter-spacing: 1px; margin-bottom: 10px;">
+                            Enter 6-Digit Code
+                        </label>
+                        <input type="text" id="exitCode" class="code-input" placeholder="XXXXXX" maxlength="6" pattern="\d{6}" required autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn-gate" id="submitBtn">
+                        <i class="fas fa-unlock"></i> Verify & Open Gate
+                    </button>
+                </form>
+            </div>
+
+            <!-- Error message feedback -->
+            <div id="error-message" style="display: none; margin-top: 1.5rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; color: #ef4444; font-weight: 600; font-size: 0.95rem;">
+                <!-- Error text injected here -->
+            </div>
+
+            <!-- Success Vehicle Details -->
+            <div id="vehicle-details" style="display: none;" class="exit-vehicle-details">
+                <h3 style="color: #10b981; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                    <i class="fas fa-check-circle"></i> ACCESS GRANTED
+                </h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.9rem;">
+                    <div><span style="color: var(--text-secondary);">Driver:</span> <strong id="val-driver" style="color: #fff;">-</strong></div>
+                    <div><span style="color: var(--text-secondary);">Vehicle Number:</span> <strong id="val-plate" style="color: #fff;">-</strong></div>
+                    <div><span style="color: var(--text-secondary);">Vehicle Type:</span> <strong id="val-vtype" style="color: #fff;">-</strong></div>
+                    <div><span style="color: var(--text-secondary);">Spot Released:</span> <strong id="val-spot" style="color: #f59e0b;">Slot #-</strong></div>
+                </div>
+                <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed rgba(16, 185, 129, 0.2); text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
+                    Gate closing in <span id="countdown-close" style="font-weight: bold; color: #10b981;">5</span> seconds...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer style="text-align: center; margin-top: 4rem; padding: 2.5rem 0; border-top: 1px solid var(--border-glass); color: var(--text-muted);">
+        <p>&copy; 2025 CommuniPark Gateways | All Rights Reserved</p>
+    </footer>
+
+    <script>
+        const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : `${window.location.origin}/api`;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('exit-code-form');
+            const input = document.getElementById('exitCode');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorDiv = document.getElementById('error-message');
+            const detailsDiv = document.getElementById('vehicle-details');
+
+            // Pre-fill if code passed in URL query parameter (convenience)
+            const params = new URLSearchParams(window.location.search);
+            const codeParam = params.get('code');
+            if (codeParam) {
+                input.value = codeParam;
+            }
+
+            // Input formatting - allow only numbers
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const code = input.value;
+                if (code.length !== 6) {
+                    showError("Exit code must be exactly 6 digits.");
+                    return;
+                }
+
+                clearFeedback();
+                disableUI();
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/exit/verify`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ exitCode: code })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || "Verification failed");
+                    }
+
+                    // Success! Open gate
+                    triggerGateRelease(data);
+
+                } catch (err) {
+                    console.error("Exit verification error:", err);
+                    showError(err.message || "Failed to communicate with parking server. Check if backend is running.");
+                    enableUI();
+                }
+            });
+
+            function triggerGateRelease(data) {
+                // UI updates for open state
+                const arm = document.getElementById('gateArm');
+                const indicator = document.getElementById('gateIndicator');
+                const statusText = document.getElementById('gate-status-text');
+                const icon = document.getElementById('indicatorIcon');
+
+                arm.classList.add('open');
+                indicator.classList.add('go');
+                statusText.style.color = '#10b981';
+                statusText.innerHTML = `
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block; animation: pulse 1s infinite;"></span>
+                    Access Granted - Gate Open
+                `;
+                icon.className = 'fas fa-arrow-up';
+
+                // Display vehicle details
+                detailsDiv.style.display = 'block';
+                document.getElementById('val-driver').textContent = data.clientName || 'N/A';
+                document.getElementById('val-plate').textContent = data.vehicleNumber || 'N/A';
+                
+                const typeEmoji = data.vehicleType === 'motorcycle' ? '🏍️ Motorcycle' : (data.vehicleType === 'truck' ? '🚛 Truck' : '🚗 Car');
+                document.getElementById('val-vtype').textContent = typeEmoji;
+                document.getElementById('val-spot').textContent = 'Slot #' + data.spotId;
+
+                // Close gate countdown
+                let secondsLeft = 5;
+                const countdownSpan = document.getElementById('countdown-close');
+                countdownSpan.textContent = secondsLeft;
+
+                const timer = setInterval(() => {
+                    secondsLeft--;
+                    countdownSpan.textContent = secondsLeft;
+                    if (secondsLeft <= 0) {
+                        clearInterval(timer);
+                        closeGate();
+                    }
+                }, 1000);
+            }
+
+            function closeGate() {
+                const arm = document.getElementById('gateArm');
+                const indicator = document.getElementById('gateIndicator');
+                const statusText = document.getElementById('gate-status-text');
+                const icon = document.getElementById('indicatorIcon');
+
+                arm.classList.remove('open');
+                indicator.classList.remove('go');
+                statusText.style.color = '#ef4444';
+                statusText.innerHTML = `
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block; animation: pulse 1s infinite;"></span>
+                    Gate Locked
+                `;
+                icon.className = 'fas fa-hand-paper';
+
+                // Reset forms
+                input.value = '';
+                detailsDiv.style.display = 'none';
+                enableUI();
+            }
+
+            function showError(msg) {
+                errorDiv.textContent = '❌ ' + msg;
+                errorDiv.style.display = 'block';
+                
+                // Highlight input field as error
+                input.style.borderColor = '#ef4444';
+            }
+
+            function clearFeedback() {
+                errorDiv.style.display = 'none';
+                input.style.borderColor = '';
+                detailsDiv.style.display = 'none';
+            }
+
+            function disableUI() {
+                input.disabled = true;
+                submitBtn.disabled = true;
+            }
+
+            function enableUI() {
+                input.disabled = false;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+    
+    <style>
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Tags -->
+    <meta name="description" content="CommuniPark Admin Console - Aggregate database statistics, manage reservation logs, and control parking slots.">
+    <meta name="keywords" content="smart parking admin, parking database, community parking stats">
+    <meta name="author" content="CommuniPark">
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>CommuniPark Admin Console</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="s.css">
+    <link rel="stylesheet" href="ra.css">
+</head>
+<body>
+    <!-- Secure Admin Login Gate -->
+    <div id="admin-login-container" style="display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 2rem;">
+        <div class="stat-card" style="width: 100%; max-width: 400px; text-align: left; padding: 2.5rem; border: 1px solid var(--border-glass); background: var(--bg-card); backdrop-filter: blur(12px); border-radius: 16px;">
+            <h2 style="text-align: center; margin-bottom: 0.5rem; font-weight: 800; background: linear-gradient(135deg, #fff 30%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Admin Portal Login</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;">Please enter security credentials for database access.</p>
+            
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label style="font-size: 0.8rem; color: #888; font-weight: 600; text-transform: uppercase;">ADMIN USERNAME</label>
+                    <input type="text" id="adminUsername" required placeholder="e.g. admin" style="width: 100%; margin-top: 5px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="font-size: 0.8rem; color: #888; font-weight: 600; text-transform: uppercase;">PASSWORD</label>
+                    <input type="password" id="adminPassword" required placeholder="••••••••" style="width: 100%; margin-top: 5px; padding: 10px 14px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass); border-radius: 8px; color: var(--text-light); font-size: 0.95rem; font-family: inherit; transition: var(--transition);">
+                </div>
+                <div id="login-error-msg" style="color: #f43f5e; font-size: 0.85rem; margin-bottom: 1.25rem; display: none; text-align: center; font-weight: 600;"></div>
+                <button type="submit" style="width: 100%; padding: 14px;">
+                    <i class="fas fa-sign-in-alt"></i> Access Superdatabase
+                </button>
+            </form>
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <a href="index.html" style="color: var(--text-secondary); font-size: 0.85rem; text-decoration: none;"><i class="fas fa-arrow-left"></i> Return Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Area (Hidden by default until login session verified) -->
+    <div id="admin-panel-container" style="display: none;">
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="#" class="logo">
+                    <i class="fas fa-parking"></i> CommuniPark
+                </a>
+                <div class="nav-links">
+                    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                    <a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a>
+                    <a href="Reservations.html"><i class="fas fa-calendar-check"></i> Reservations</a>
+                    <a href="Profile.html"><i class="fas fa-user"></i> Profile</a>
+                    <a href="exit.html"><i class="fas fa-door-open"></i> Exit Gate</a>
+                    <a href="#" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container">
+            <div class="dashboard">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2 style="font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #fff 30%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            Superdatabase Admin Console
+                        </h2>
+                        <p style="color: var(--text-secondary); margin-top: 0.25rem;">Aggregate Community Stats & Database Records Control</p>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button onclick="resetDatabase()" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 4px 10px rgba(245,158,11,0.2);">
+                            <i class="fas fa-database"></i> Reset DB
+                        </button>
+                        <button onclick="fetchAdminData()" style="background: var(--accent);">
+                            <i class="fas fa-sync"></i> Refresh Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Aggregated SUM Control Statistics Panel -->
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <h3>Total Database Bookings</h3>
+                        <p id="admin-total-bookings" style="color: #818cf8; text-shadow: 0 0 15px rgba(129,140,248,0.3);">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Sum Revenue Generated</h3>
+                        <p id="admin-sum-revenue" style="color: #10b981; text-shadow: 0 0 15px rgba(16,185,129,0.3);">₹0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Sum Booking Duration</h3>
+                        <p id="admin-sum-hours" style="color: var(--available); text-shadow: 0 0 15px rgba(6, 182, 212, 0.3);">0h</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Occupancy</h3>
+                        <p id="admin-occupancy" style="color: var(--vip); text-shadow: 0 0 15px rgba(245,158,11,0.3);">0%</p>
+                    </div>
+                </div>
+
+                <!-- Distribution Charts -->
+                <div class="charts-grid" style="margin-bottom: 3rem;">
+                    <div class="chart-container">
+                        <h3>Resident vs Visitor Bookings</h3>
+                        <canvas id="userTypeChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Vehicle Type Distribution</h3>
+                        <canvas id="adminVehicleChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Database Spots Control Table -->
+                <div class="chart-container full-width" style="margin-bottom: 3rem; height: auto;">
+                    <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-th" style="margin-right: 0.5rem;"></i> Parking Spots Grid Manager</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                <th>Spot ID</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Current Vehicle</th>
+                                <th>Apartment Unit</th>
+                                <th>User Type</th>
+                                <th>Session Duration</th>
+                                <th>Revenue</th>
+                                <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-spots-body">
+                                <!-- Dynamic spots content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Database Reservations Control Table -->
+                <div class="chart-container full-width" style="height: auto;">
+                    <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-list-alt" style="margin-right: 0.5rem;"></i> Database Reservation Audit Logs</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Log ID</th>
+                                    <th>Spot</th>
+                                    <th>Driver Name</th>
+                                    <th>Email</th>
+                                    <th>User Type</th>
+                                    <th>Apartment</th>
+                                    <th>Vehicle</th>
+                                    <th>Duration</th>
+                                    <th>Revenue</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                    <th>Receipts</th>
+                                    <th>Log Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-reservations-body">
+                                <!-- Dynamic reservations content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer style="text-align: center; margin-top: 4rem; padding: 2.5rem 0; border-top: 1px solid var(--border-glass); color: var(--text-muted);">
+            <p>&copy; 2025 CommuniPark System | All Rights Reserved</p>
+        </footer>
+    </div>
+
+    <script>
+    const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : `${window.location.origin}/api`;
+    let userTypeChart = null;
+    let vehicleChart = null;
+    let pollingInterval = null;
+    let isPerformingAction = false;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        checkAdminSession();
+        startPolling();
+    });
+
+    function startPolling() {
+        if (pollingInterval) clearInterval(pollingInterval);
+        pollingInterval = setInterval(function() {
+            var isLoggedIn = sessionStorage.getItem('adminSession') === 'true';
+            if (isLoggedIn && !isPerformingAction) {
+                fetchAdminData();
+            }
+        }, 5000);
+    }
+
+    function stopPolling() {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+        }
+    }
+
+    function checkAdminSession() {
+        var isLoggedIn = sessionStorage.getItem('adminSession') === 'true';
+        var loginContainer = document.getElementById('admin-login-container');
+        var panelContainer = document.getElementById('admin-panel-container');
+        if (isLoggedIn) {
+            if (loginContainer) loginContainer.style.display = 'none';
+            if (panelContainer) panelContainer.style.display = 'block';
+            fetchAdminData();
+        } else {
+            if (loginContainer) loginContainer.style.display = 'flex';
+            if (panelContainer) panelContainer.style.display = 'none';
+        }
+    }
+
+    function handleAdminLogin(event) {
+        event.preventDefault();
+        var u = document.getElementById('adminUsername').value;
+        var p = document.getElementById('adminPassword').value;
+        var errorEl = document.getElementById('login-error-msg');
+        if (u === 'admin' && p === 'admin123') {
+            sessionStorage.setItem('adminSession', 'true');
+            if (errorEl) errorEl.style.display = 'none';
+            checkAdminSession();
+            startPolling();
+        } else {
+            if (errorEl) {
+                errorEl.textContent = '❌ Access Denied: Invalid security credentials.';
+                errorEl.style.display = 'block';
+            }
+        }
+    }
+
+    function adminLogout() {
+        sessionStorage.removeItem('adminSession');
+        stopPolling();
+        alert('Logged out successfully.');
+        checkAdminSession();
+    }
+
+    function fetchAdminData() {
+        fetch(API_BASE_URL + '/dashboard/stats')
+            .then(function(res) { return res.json(); })
+            .then(function(stats) {
+                var el1 = document.getElementById("admin-total-bookings");
+                var el2 = document.getElementById("admin-sum-revenue");
+                var el3 = document.getElementById("admin-sum-hours");
+                var el4 = document.getElementById("admin-occupancy");
+                if (el1) el1.textContent = stats.totalBookings || '0';
+                if (el2) el2.textContent = stats.totalRevenue || '₹0';
+                if (el3) el3.textContent = stats.totalHours || '0h';
+                if (el4) el4.textContent = stats.occupancyRate || '0%';
+                updateCharts(stats);
+                renderSpotsGrid(stats.parkingDetails);
+                fetchAndRenderAllLogs();
+                var dbAlert = document.getElementById('db-admin-alert');
+                if (dbAlert) dbAlert.remove();
+            })
+            .catch(function(error) {
+                console.error("Admin data fetch error:", error);
+                showDbAlert();
+            });
+    }
+
+    function updateCharts(stats) {
+        var el1 = document.getElementById("userTypeChart");
+        if (el1) {
+            if (userTypeChart) userTypeChart.destroy();
+            userTypeChart = new Chart(el1.getContext("2d"), {
+                type: "doughnut",
+                data: { labels: ["Residents","Visitors"], datasets: [{ data: stats.residentVsVisitor||[3,2], backgroundColor:["#3b82f6","#f59e0b"], borderWidth:0 }] },
+                options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom',labels:{boxWidth:12,padding:15,color:'#9ca3af'}} } }
+            });
+        }
+        var el2 = document.getElementById("adminVehicleChart");
+        if (el2) {
+            if (vehicleChart) vehicleChart.destroy();
+            vehicleChart = new Chart(el2.getContext("2d"), {
+                type: "doughnut",
+                data: { labels: ["Cars","Bikes","Trucks"], datasets: [{ data: stats.vehicleTypeDistribution||[2,1,1], backgroundColor:["#818cf8","#10b981","#ec4899"], borderWidth:0 }] },
+                options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom',labels:{boxWidth:12,padding:15,color:'#9ca3af'}} } }
+            });
+        }
+    }
+
+    function renderSpotsGrid(spots) {
+        var tbody = document.getElementById("admin-spots-body");
+        if (!tbody || !spots) return;
+        tbody.innerHTML = "";
+        spots.forEach(function(s) {
+            var row = document.createElement("tr");
+            var isOccupied = s.status && s.status.toLowerCase() === "occupied";
+            var statusColor = isOccupied ? "color:#f43f5e;font-weight:600;" : "color:#06b6d4;font-weight:600;";
+            var catLabel = (s.type && s.type.toLowerCase()==='vip') ? "VIP Owner" : ((s.id===3||s.id===6) ? "2W" : "4W");
+            var actionBtn = "-";
+            if (isOccupied && s.reservationId) {
+                actionBtn = '<button class="release-btn" onclick="forceReleaseSpot('+s.reservationId+','+s.id+')" style="padding:4px 8px;font-size:0.8rem;"><i class="fas fa-sign-out-alt"></i> Force Release</button>';
+            }
+            row.innerHTML = '<td><strong>Slot #'+s.id+'</strong></td><td><span class="spot-type-badge">'+catLabel+'</span></td><td><span style="'+statusColor+'">'+(s.status||'unknown').toUpperCase()+'</span></td><td><code>'+(s.vehicle!=='N/A'?s.vehicle:'-')+'</code></td><td><span style="color:#a5b4fc;font-weight:500;">'+(s.apartmentNumber!=='N/A'?'Unit '+s.apartmentNumber:'-')+'</span></td><td>'+(s.userType!=='N/A'?s.userType:'-')+'</td><td>'+s.duration+'</td><td><strong>'+s.revenue+'</strong></td><td>'+actionBtn+'</td>';
+            tbody.appendChild(row);
+        });
+    }
+
+    function fetchAndRenderAllLogs() {
+        var tbody = document.getElementById("admin-reservations-body");
+        if (!tbody) return;
+        fetch(API_BASE_URL + '/reservations')
+            .then(function(res) { return res.json(); })
+            .then(function(reservations) {
+                reservations.sort(function(a,b) { return b.id - a.id; });
+                tbody.innerHTML = "";
+                if (reservations.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#6b7280;padding:2rem;">No reservation logs.</td></tr>';
+                    return;
+                }
+                reservations.forEach(function(r) {
+                    var row = document.createElement("tr");
+                    var isCompleted = r.status && r.status.toLowerCase() === 'completed';
+                    var isPaid = r.paymentStatus === 'PAID';
+                    var statusStyle = isCompleted ? 'background:rgba(16,185,129,0.1);color:#10b981;padding:4px 8px;border-radius:4px;font-weight:600;' : 'background:rgba(59,130,246,0.1);color:#3b82f6;padding:4px 8px;border-radius:4px;font-weight:600;';
+                    var btns = "";
+                    if (!isCompleted) {
+                        btns += '<button class="release-btn" onclick="forceReleaseSpot('+r.id+','+(r.parkingSpot?r.parkingSpot.id:0)+')" style="padding:4px 8px;font-size:0.8rem;margin-right:0.25rem;"><i class="fas fa-sign-out-alt"></i> Release</button>';
+                    }
+                    if (!isPaid && r.paymentMethod) {
+                        btns += '<button onclick="adminConfirmPayment('+r.id+')" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:4px 8px;font-size:0.8rem;border-radius:6px;cursor:pointer;margin-right:0.25rem;"><i class="fas fa-check"></i> Confirm Pay</button>';
+                    }
+                    if (isPaid) {
+                        btns += '<button onclick="printReceiptForReservation('+r.id+')" style="background:rgba(129,140,248,0.15);color:#818cf8;border:1px solid rgba(129,140,248,0.3);padding:4px 8px;font-size:0.8rem;border-radius:6px;cursor:pointer;margin-right:0.25rem;"><i class="fas fa-print"></i> Print</button>';
+                    }
+                    btns += '<button onclick="purgeReservationRecord('+r.id+')" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:4px 8px;font-size:0.8rem;border-radius:6px;cursor:pointer;"><i class="fas fa-trash"></i> Delete</button>';
+
+                    var spotCat = '4W';
+                    if (r.parkingSpot) { if (r.parkingSpot.type==='vip') spotCat='VIP'; else if (r.parkingSpot.id===3||r.parkingSpot.id===6) spotCat='2W'; }
+                    var spotName = r.parkingSpot ? 'Slot #'+r.parkingSpot.id+' ('+spotCat+')' : 'N/A';
+                    var vText = (r.vehicleType||'vehicle').toUpperCase()+' ('+(r.vehicleNumber||'N/A')+')';
+                    var aptNo = r.apartmentNumber || 'N/A';
+                    var uType = r.userType || 'Resident';
+                    var rev = typeof r.revenue === 'number' ? r.revenue.toFixed(0) : '0';
+                    var payBadge = isPaid ? '<span style="background:rgba(16,185,129,0.1);color:#10b981;padding:4px 8px;border-radius:4px;font-size:0.8rem;font-weight:600;">PAID ✅</span>' : (r.paymentStatus==='PENDING' ? '<span style="background:rgba(245,158,11,0.1);color:#f59e0b;padding:4px 8px;border-radius:4px;font-size:0.8rem;font-weight:600;">PENDING ⏳</span>' : '<span style="background:rgba(156,163,175,0.1);color:#9ca3af;padding:4px 8px;border-radius:4px;font-size:0.8rem;font-weight:600;">N/A</span>');
+                    var rcptLinks = '-';
+                    if (isPaid) {
+                        rcptLinks = '<div style="display:flex;flex-direction:column;gap:4px;font-size:0.75rem;"><a href="'+API_BASE_URL+'/receipts/reservation/'+r.id+'" target="_blank" style="color:#818cf8;text-decoration:none;font-weight:600;">🧾 JSON</a><a href="#" onclick="printReceiptForReservation('+r.id+');return false;" style="color:#10b981;text-decoration:none;font-weight:600;">📄 Print</a></div>';
+                    }
+                    row.innerHTML = '<td><strong>#'+r.id+'</strong></td><td><span style="color:#818cf8;font-weight:500;">'+spotName+'</span></td><td>'+(r.clientName||'N/A')+'</td><td><small style="color:#9ca3af;">'+(r.clientEmail||'N/A')+'</small></td><td><span style="font-size:0.8rem;font-weight:600;color:'+(uType.toLowerCase()==='resident'?'#3b82f6':'#f59e0b')+';">'+uType+'</span></td><td><span style="color:#a5b4fc;font-weight:600;">Unit '+aptNo+'</span></td><td><code>'+vText+'</code></td><td>'+(r.duration||0)+'h</td><td><strong>₹'+rev+'</strong></td><td>'+payBadge+'</td><td><span style="'+statusStyle+'">'+(r.status||'unknown').toUpperCase()+'</span></td><td>'+rcptLinks+'</td><td style="white-space:nowrap;">'+btns+'</td>';
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(function(error) {
+                console.error("Logs error:", error);
+                tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#ef4444;padding:2rem;">❌ Error loading logs.</td></tr>';
+            });
+    }
+
+    function printReceiptForReservation(reservationId) {
+        fetch(API_BASE_URL + '/receipts/reservation/' + reservationId)
+            .then(function(res) { return res.json(); })
+            .then(function(receipts) {
+                if (!receipts || receipts.length === 0) { alert('No receipts for #'+reservationId); return; }
+                var c = receipts.find(function(r){return r.receiptType==='CUSTOMER';}) || receipts[0];
+                window.open(API_BASE_URL + '/receipts/' + c.id + '/html', '_blank');
+            })
+            .catch(function(e) { alert('Error: '+e.message); });
+    }
+
+    function forceReleaseSpot(reservationId, spotId) {
+        if (!confirm('Release reservation #'+reservationId+' and free Spot #'+spotId+'?')) return;
+        isPerformingAction = true;
+        fetch(API_BASE_URL + '/reservations/' + reservationId, { method: 'DELETE' })
+            .then(function(res) {
+                if (!res.ok) throw new Error('Failed');
+                alert('✅ Spot #'+spotId+' released!');
+                fetchAdminData();
+            })
+            .catch(function(e) { alert('❌ Error: '+e.message); })
+            .finally(function() { isPerformingAction = false; });
+    }
+
+    function purgeReservationRecord(id) {
+        if (!confirm('WARNING: Delete reservation #'+id+' permanently?')) return;
+        isPerformingAction = true;
+        fetch(API_BASE_URL + '/reservations/' + id + '/delete', { method: 'DELETE' })
+            .then(function(res) {
+                if (!res.ok) throw new Error('Failed');
+                alert('✅ Reservation #'+id+' deleted!');
+                fetchAdminData();
+            })
+            .catch(function(e) { alert('❌ Error: '+e.message); })
+            .finally(function() { isPerformingAction = false; });
+    }
+
+    function adminConfirmPayment(reservationId) {
+        if (!confirm('Mark reservation #'+reservationId+' as PAID?')) return;
+        isPerformingAction = true;
+        fetch(API_BASE_URL + '/payment/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reservationId: reservationId, paymentMethod: 'UPI' })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.status === 'PAID') {
+                alert('✅ Payment Confirmed!\nReceipt: '+data.receiptNumber+'\nAmount: ₹'+data.amount);
+                fetchAdminData();
+            } else {
+                alert('❌ Failed: '+(data.error||'Unknown error'));
+            }
+        })
+        .catch(function(e) { alert('❌ Error: '+e.message); })
+        .finally(function() { isPerformingAction = false; });
+    }
+
+    function resetDatabase() {
+        if (!confirm('Reset database to default seed data? All custom data will be lost.')) return;
+        isPerformingAction = true;
+        fetch(API_BASE_URL + '/admin/reset', { method: 'POST' })
+            .then(function(res) {
+                if (!res.ok) throw new Error('Failed');
+                alert('✅ Database reset!');
+                fetchAdminData();
+            })
+            .catch(function(e) { alert('❌ Error: '+e.message); })
+            .finally(function() { isPerformingAction = false; });
+    }
+
+    function showDbAlert() {
+        var mainDiv = document.querySelector('.dashboard');
+        if (mainDiv && !document.getElementById('db-admin-alert')) {
+            var el = document.createElement('div');
+            el.id = 'db-admin-alert';
+            el.style.cssText = "padding:1.25rem;margin-bottom:2rem;background:rgba(239,68,68,0.1);border:1px solid #ef4444;color:#ef4444;border-radius:10px;text-align:center;font-weight:600;";
+            el.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Cannot connect to backend server (localhost:8080).';
+            mainDiv.prepend(el);
+        }
+    }
+    </script>
+</body>
+</html>

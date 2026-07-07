@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Site Verification -->
+    <meta name="google-site-verification" content="XX4hPwv3MLlExDokvccOsb_7M6vrn_qYyE4S0lgyYmw" />
+    
+    <!-- Full SEO Tags -->
+    <meta name="description" content="Smart Parking System - Find, reserve, and manage parking spots easily and securely. Real-time availability and hassle-free booking.">
+    <meta name="keywords" content="smart parking, parking system, online parking reservation, parking spaces, vehicle parking management">
+    <meta name="author" content="Smart Parking">
+    <meta name="robots" content="index, follow">
+    
+    <!-- GEO Tags -->
+    <meta name="geo.region" content="IN-AP">
+    <meta name="geo.placename" content="Andhra Pradesh">
+    <meta name="geo.position" content="15.9129;79.7400">
+    <meta name="ICBM" content="15.9129, 79.7400">
+
+    <title>CommuniPark - Apartment & Greater Community Parking Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="s.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-parking"></i> CommuniPark
+            </a>
+            <div class="nav-links">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a>
+                <a href="Reservations.html"><i class="fas fa-calendar-check"></i> Reservations</a>
+                <a href="Profile.html"><i class="fas fa-user"></i> Profile</a>
+                <a href="admin.html"><i class="fas fa-user-shield"></i> Admin</a>
+                <a href="exit.html"><i class="fas fa-door-open"></i> Exit Gate</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>CommuniPark Community Hub</h1>
+            <p>Smart Apartment & Greater Community Parking Management</p>
+            <p style="margin-top: 0.75rem; font-size: 1.1rem;">Available Spaces: <span id="available-spaces">10</span></p>
+        </div>
+
+        <div class="status-indicator">
+            <div class="status-item">
+                <div class="parking-slot" style="width: 30px; height: 30px"></div>
+                <span>Available</span>
+            </div>
+            <div class="status-item">
+                <div class="parking-slot occupied" style="width: 30px; height: 30px"></div>
+                <span>Occupied</span>
+            </div>
+            <div class="status-item">
+                <div class="parking-slot vip" style="width: 30px; height: 30px"></div>
+                <span>VIP Spot</span>
+            </div>
+        </div>
+
+        <div class="parking-grid" id="parkingGrid"></div>
+
+        <div class="overlay" id="overlay"></div>
+        <div class="reservation-form" id="reservationForm">
+            <h3>Reserve Parking Spot</h3>
+            <form id="reservationFormContent">
+                <div class="form-group">
+                    <label>Vehicle Number:</label>
+                    <input type="text" id="vehicleNumber" placeholder="e.g. AP-28-AB-1234" required>
+                </div>
+                <div class="form-group">
+                    <label>Vehicle Type:</label>
+                    <select id="vehicleType" required>
+                        <option value="car">🚗 Car</option>
+                        <option value="motorcycle">🏍️ Motorcycle</option>
+                        <option value="truck">🚛 Truck</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>User Type:</label>
+                    <select id="userType" required>
+                        <option value="Resident">Resident</option>
+                        <option value="Visitor">Visitor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Apartment / Unit #:</label>
+                    <input type="text" id="apartmentNumber" placeholder="e.g. 402B" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration:</label>
+                    <select id="duration" required>
+                        <option value="1">1 Hour</option>
+                        <option value="2">2 Hours</option>
+                        <option value="3">3 Hours</option>
+                        <option value="4">4 Hours</option>
+                        <option value="5">5 Hours</option>
+                        <option value="6">6 Hours</option>
+                        <option value="7">7 Hours</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Booking Date (min. 1 day advance):</label>
+                    <input type="date" id="bookingDate" required>
+                </div>
+                <div class="form-group">
+                    <label>WhatsApp Number:</label>
+                    <input type="tel" id="phoneNumber" placeholder="+91 98765 43210">
+                </div>
+                <div class="form-group">
+                    <label>Payment Method:</label>
+                    <select id="paymentMethod" required>
+                        <option value="RAZORPAY" selected>💳 Pay with Razorpay (Instant Exit Code)</option>
+                        <option value="UPI">📱 UPI QR (Manual)</option>
+                        <option value="CASH">💵 Cash</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1.5rem;">
+                    <button type="submit">Reserve & Pay</button>
+                    <button type="button" onclick="closeForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="confirmation-message" style="display: none; text-align: center; font-size: 18px; color: green; margin-top: 20px;"></div>
+
+    <script src="s.js"></script>
+</body>
+</html>

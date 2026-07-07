@@ -1,0 +1,560 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-dark: #0b0f19;
+    --bg-glass: rgba(17, 24, 39, 0.7);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --bg-card: rgba(20, 26, 43, 0.55);
+    
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --text-light: #ffffff;
+
+    /* Semantic / Accent Colors */
+    --accent: #4f46e5;
+    --accent-glow: rgba(79, 70, 229, 0.4);
+    --accent-hover: #6366f1;
+    
+    --available: #06b6d4; /* cyan */
+    --available-glow: rgba(6, 182, 212, 0.3);
+    
+    --occupied: #f43f5e; /* rose/red */
+    --occupied-glow: rgba(244, 63, 94, 0.3);
+    
+    --vip: #f59e0b; /* amber */
+    --vip-glow: rgba(245, 158, 11, 0.3);
+
+    --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(244, 63, 94, 0.05) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+}
+
+/* Navigation Styles */
+.navbar {
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-glass);
+    padding: 1.25rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: var(--text-light);
+    font-size: 1.75rem;
+    font-weight: 800;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo i {
+    -webkit-text-fill-color: initial;
+    color: #818cf8;
+    filter: drop-shadow(0 0 8px rgba(129, 140, 248, 0.6));
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+}
+
+.nav-links a i {
+    font-size: 0.95rem;
+}
+
+.nav-links a:hover {
+    color: var(--text-light);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Page Container Layout */
+.container {
+    max-width: 1200px;
+    margin: 2.5rem auto;
+    padding: 0 24px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 3rem;
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 30%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header p {
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+#available-spaces {
+    background: var(--available-glow);
+    color: var(--available);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    padding: 0.2rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    margin-left: 0.5rem;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+}
+
+/* Parking Slots Grid & Elements */
+.parking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 3rem;
+}
+
+.parking-slot {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    overflow: hidden;
+}
+
+.parking-slot::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--available);
+    box-shadow: 0 2px 8px var(--available-glow);
+    transition: var(--transition);
+}
+
+.parking-slot.occupied::before {
+    background: var(--occupied);
+    box-shadow: 0 2px 8px var(--occupied-glow);
+}
+
+.parking-slot.vip::before {
+    background: var(--vip);
+    box-shadow: 0 2px 8px var(--vip-glow);
+}
+
+.parking-slot h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-top: 0.25rem;
+}
+
+.spot-type-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-glass);
+    color: var(--text-secondary);
+}
+
+.parking-slot.vip .spot-type-badge {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+    color: var(--vip);
+}
+
+.vip-star {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: var(--vip);
+    font-size: 1rem;
+    filter: drop-shadow(0 0 4px var(--vip-glow));
+}
+
+.spot-status-text {
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--available);
+}
+
+.parking-slot.occupied .spot-status-text {
+    color: var(--occupied);
+}
+
+/* Hover effects */
+.parking-slot:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Status Indicators Info */
+.status-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    background: rgba(255,255,255,0.02);
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-glass);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.status-item .parking-slot {
+    padding: 0;
+    box-shadow: none;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-item .parking-slot::before {
+    display: none;
+}
+
+.status-item .parking-slot.occupied {
+    background-color: var(--occupied);
+}
+.status-item .parking-slot.vip {
+    background-color: var(--vip);
+}
+.status-item .parking-slot.available {
+    background-color: var(--available);
+}
+
+/* Reservation Modal Form */
+.reservation-form {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #0f1524;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    width: 90%;
+    max-width: 450px;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.reservation-form h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+input[type="text"], input[type="number"], input[type="tel"], input[type="password"], select, input[type="email"], input[type="date"], input[type="time"] {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: var(--transition);
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-hover);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* Button & Controls */
+button {
+    background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
+    color: var(--text-light);
+    border: none;
+    padding: 12px 24px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+button:hover {
+    background: linear-gradient(135deg, var(--accent-hover) 0%, #818cf8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+
+button[type="button"] {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    color: var(--text-secondary);
+    box-shadow: none;
+    margin-left: 0.5rem;
+}
+
+button[type="button"]:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: none;
+    box-shadow: none;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(5, 7, 12, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 999;
+}
+
+/* Footer Section */
+footer {
+    text-align: center;
+    margin-top: 5rem;
+    padding: 2.5rem 0;
+    border-top: 1px solid var(--border-glass);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Form layout for Reservations Page */
+#reservation-form {
+    max-width: 550px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+#reservation-form h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: var(--text-light);
+}
+
+#booking-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+}
+
+#booking-form .input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+#booking-form .input-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+#booking-form button[type="submit"] {
+    margin-top: 1rem;
+    padding: 14px;
+}
+
+select option {
+    background-color: #0f1524;
+    color: #f3f4f6;
+}
+
+.spot-type-badge {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+/* Two-wheeler category strip override */
+.parking-slot.two-wheeler::before {
+    background: #10b981 !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Indian style occupied slot border styling */
+.parking-slot.occupied {
+    box-shadow: 0 0 15px rgba(244, 63, 94, 0.25) !important;
+    border: 2px dashed #f43f5e !important;
+}
+
+/* Payment Gateway Utility Styling */
+.payment-method-card {
+    border: 2px solid #334155 !important;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.payment-method-card:hover {
+    transform: translateY(-2px);
+    border-color: #818cf8 !important;
+    box-shadow: 0 4px 12px rgba(129, 140, 248, 0.15);
+}
+.payment-method-card.selected {
+    border-color: #818cf8 !important;
+    background: rgba(129, 140, 248, 0.1) !important;
+}
+
+/* Mobile Responsive Navigation */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .nav-links {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .nav-links a {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.5rem;
+    }
+    .logo {
+        font-size: 1.35rem;
+    }
+    .header h1 {
+        font-size: 1.75rem;
+    }
+    .parking-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+    }
+    .reservation-form {
+        width: 95% !important;
+        padding: 1.5rem !important;
+    }
+}

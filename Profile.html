@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Site Verification -->
+    <meta name="google-site-verification" content="XX4hPwv3MLlExDokvccOsb_7M6vrn_qYyE4S0lgyYmw" />
+    
+    <!-- Full SEO Tags -->
+    <meta name="description" content="Manage your Smart Parking profile, view your active and past parking reservations, and update vehicle info.">
+    <meta name="keywords" content="smart parking profile, parking account, parking reservation history">
+    <meta name="author" content="Smart Parking">
+    <meta name="robots" content="index, follow">
+    
+    <!-- GEO Tags -->
+    <meta name="geo.region" content="IN-AP">
+    <meta name="geo.placename" content="Andhra Pradesh">
+    <meta name="geo.position" content="15.9129;79.7400">
+    <meta name="ICBM" content="15.9129, 79.7400">
+
+    <title>My CommuniPark Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="s.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-parking"></i> CommuniPark
+            </a>
+            <div class="nav-links">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a>
+                <a href="Reservations.html"><i class="fas fa-calendar-check"></i> Reservations</a>
+                <a href="Profile.html"><i class="fas fa-user"></i> Profile</a>
+                <a href="admin.html"><i class="fas fa-user-shield"></i> Admin</a>
+                <a href="exit.html"><i class="fas fa-door-open"></i> Exit Gate</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="profile-layout" style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-top: 2rem;">
+            
+            <!-- Left Side: Profile Card / Form -->
+            <section class="profile-card" style="background: var(--bg-card); padding: 2rem; border-radius: 12px; box-shadow: var(--shadow); text-align: center; border: 1px solid var(--border-glass);">
+                <div id="profile-view-state">
+                    <div class="avatar-container" style="position: relative; width: 120px; height: 120px; margin: 0 auto 1.5rem auto;">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Driver Profile Avatar" style="width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--accent); object-fit: cover;">
+                    </div>
+                    <h2 id="profile-name" style="margin-bottom: 0.25rem;">Eslavath Narasimha</h2>
+                    <p id="profile-role" style="color: var(--accent); font-weight: 600; font-size: 0.95rem; margin-bottom: 1.5rem;">Community Resident</p>
+                    
+                    <div class="profile-details" style="text-align: left; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <span style="font-size: 0.8rem; color: #888; display: block;">EMAIL</span>
+                            <strong id="detail-email">narasimha@example.com</strong>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <span style="font-size: 0.8rem; color: #888; display: block;">DEFAULT VEHICLE</span>
+                            <strong id="detail-vehicle">AP-28-AB-1234 (Car)</strong>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <span style="font-size: 0.8rem; color: #888; display: block;">USER TYPE</span>
+                            <strong id="detail-usertype">Resident</strong>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <span style="font-size: 0.8rem; color: #888; display: block;">APARTMENT UNIT</span>
+                            <strong id="detail-apartment">402B</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap;">
+                        <button onclick="toggleEditProfile(true)" style="padding: 8px 16px; font-size: 0.9rem; background: var(--accent); border-radius: 6px;">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
+                        <button onclick="deleteProfile()" style="padding: 8px 16px; font-size: 0.9rem; background: #ef4444; border-radius: 6px;">
+                            <i class="fas fa-trash-alt"></i> Remove Profile
+                        </button>
+                    </div>
+                </div>
+
+                <div id="profile-edit-state" style="display: none; text-align: left;">
+                    <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--text-light);">Set Up Profile</h3>
+                    <form id="profileForm" onsubmit="saveProfile(event)">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.8rem; color: #888; font-weight: 600;">FULL NAME</label>
+                            <input type="text" id="edit-name" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.8rem; color: #888; font-weight: 600;">EMAIL ADDRESS</label>
+                            <input type="email" id="edit-email" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.8rem; color: #888; font-weight: 600;">DEFAULT VEHICLE #</label>
+                            <input type="text" id="edit-vehicle" placeholder="e.g. AP-28-AB-1234" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.8rem; color: #888; font-weight: 600;">USER TYPE</label>
+                            <select id="edit-usertype" required style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); width: 100%; border-radius: 8px;">
+                                <option value="Resident">Resident</option>
+                                <option value="Visitor">Visitor</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.8rem; color: #888; font-weight: 600;">APARTMENT UNIT #</label>
+                            <input type="text" id="edit-apartment" placeholder="e.g. 402B" required>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1.5rem;">
+                            <button type="submit" style="padding: 8px 16px; font-size: 0.9rem;">Save</button>
+                            <button type="button" onclick="toggleEditProfile(false)" style="padding: 8px 16px; font-size: 0.9rem; background: rgba(255,255,255,0.05); color: #9ca3af;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Right Side: User Reservation History -->
+            <section class="profile-history" style="background: var(--bg-card); padding: 2rem; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border-glass);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>My Reservation History</h2>
+                    <button onclick="fetchUserProfileReservations()" style="background-color: var(--accent); color: var(--text-light); border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: background 0.2s;">
+                        <i class="fas fa-sync"></i> Sync
+                    </button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="dashboard-table" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Spot</th>
+                                <th>Vehicle Number</th>
+                                <th>Duration</th>
+                                <th>Cost</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-reservations-body">
+                            <!-- Filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer style="text-align: center; margin-top: 4rem; padding: 2rem 0; border-top: 1px solid rgba(255,255,255,0.05); color: #888;">
+        <p>&copy; 2025 CommuniPark System | All Rights Reserved</p>
+    </footer>
+
+    <script>
+        const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : `${window.location.origin}/api`;
+
+        function initProfile() {
+            if (localStorage.getItem('profileName') === null) {
+                // Seed default values on first load
+                localStorage.setItem('profileName', 'Eslavath Narasimha');
+                localStorage.setItem('profileEmail', 'narasimha@example.com');
+                localStorage.setItem('profileVehicle', 'AP-28-AB-1234');
+                localStorage.setItem('profileUserType', 'Resident');
+                localStorage.setItem('profileApartment', '402B');
+            }
+            updateProfileUI();
+            fetchUserProfileReservations();
+        }
+
+        function updateProfileUI() {
+            const hasProfile = localStorage.getItem('profileName') !== null;
+            const viewState = document.getElementById('profile-view-state');
+            const editState = document.getElementById('profile-edit-state');
+
+            if (hasProfile) {
+                document.getElementById('profile-name').textContent = localStorage.getItem('profileName');
+                document.getElementById('detail-email').textContent = localStorage.getItem('profileEmail');
+                document.getElementById('detail-vehicle').textContent = localStorage.getItem('profileVehicle');
+                document.getElementById('detail-usertype').textContent = localStorage.getItem('profileUserType');
+                document.getElementById('detail-apartment').textContent = localStorage.getItem('profileApartment');
+                
+                document.getElementById('profile-role').textContent = localStorage.getItem('profileUserType') === 'Resident' 
+                    ? 'Community Resident' : 'Registered Visitor';
+
+                viewState.style.display = 'block';
+                editState.style.display = 'none';
+            } else {
+                viewState.style.display = 'none';
+                editState.style.display = 'block';
+                
+                document.getElementById('edit-name').value = '';
+                document.getElementById('edit-email').value = '';
+                document.getElementById('edit-vehicle').value = '';
+                document.getElementById('edit-usertype').value = 'Resident';
+                document.getElementById('edit-apartment').value = '';
+            }
+        }
+
+        function toggleEditProfile(show) {
+            const viewState = document.getElementById('profile-view-state');
+            const editState = document.getElementById('profile-edit-state');
+            if (show) {
+                document.getElementById('edit-name').value = localStorage.getItem('profileName') || '';
+                document.getElementById('edit-email').value = localStorage.getItem('profileEmail') || '';
+                document.getElementById('edit-vehicle').value = localStorage.getItem('profileVehicle') || '';
+                document.getElementById('edit-usertype').value = localStorage.getItem('profileUserType') || 'Resident';
+                document.getElementById('edit-apartment').value = localStorage.getItem('profileApartment') || '';
+                
+                viewState.style.display = 'none';
+                editState.style.display = 'block';
+            } else {
+                if (localStorage.getItem('profileName')) {
+                    viewState.style.display = 'block';
+                    editState.style.display = 'none';
+                } else {
+                    alert('Please create a profile first.');
+                }
+            }
+        }
+
+        function saveProfile(event) {
+            event.preventDefault();
+            const name = document.getElementById('edit-name').value;
+            const email = document.getElementById('edit-email').value;
+            const vehicle = document.getElementById('edit-vehicle').value;
+            const userType = document.getElementById('edit-usertype').value;
+            const apartment = document.getElementById('edit-apartment').value;
+
+            localStorage.setItem('profileName', name);
+            localStorage.setItem('profileEmail', email);
+            localStorage.setItem('profileVehicle', vehicle);
+            localStorage.setItem('profileUserType', userType);
+            localStorage.setItem('profileApartment', apartment);
+
+            updateProfileUI();
+            fetchUserProfileReservations();
+        }
+
+        async function deleteProfile() {
+            if (!confirm('Are you sure you want to remove your profile from the CommuniPark website? This will erase your credentials locally.')) {
+                return;
+            }
+
+            const email = localStorage.getItem('profileEmail');
+            if (email) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/reservations`);
+                    if (response.ok) {
+                        const allReservations = await response.json();
+                        const activeRes = allReservations.filter(res => 
+                            res.clientEmail && res.clientEmail.toLowerCase() === email.toLowerCase() && res.status === 'active'
+                        );
+
+                        if (activeRes.length > 0) {
+                            const deleteBookings = confirm(`Found ${activeRes.length} active reservation(s) under your email. Release them all from the database too?`);
+                            if (deleteBookings) {
+                                for (let r of activeRes) {
+                                    await fetch(`${API_BASE_URL}/reservations/${r.id}`, {
+                                        method: 'DELETE'
+                                    });
+                                }
+                                alert('All active parking spots released.');
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error cancelling bookings on profile removal:", err);
+                }
+            }
+
+            localStorage.removeItem('profileName');
+            localStorage.removeItem('profileEmail');
+            localStorage.removeItem('profileVehicle');
+            localStorage.removeItem('profileUserType');
+            localStorage.removeItem('profileApartment');
+
+            alert('Profile removed successfully.');
+            updateProfileUI();
+            fetchUserProfileReservations();
+        }
+
+        async function fetchUserProfileReservations() {
+            const tbody = document.getElementById('my-reservations-body');
+            if (!tbody) return;
+
+            const USER_EMAIL = localStorage.getItem('profileEmail');
+            if (!USER_EMAIL) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #6b7280; padding: 2rem;">Please set up a profile to see your reservation history.</td></tr>`;
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/reservations`);
+                if (!response.ok) throw new Error("Failed to load user reservations");
+                
+                const allReservations = await response.json();
+                
+                const myReservations = allReservations.filter(res => 
+                    res.clientEmail && res.clientEmail.toLowerCase() === USER_EMAIL.toLowerCase()
+                );
+
+                tbody.innerHTML = '';
+
+                if (myReservations.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #6b7280; padding: 2rem;">No reservations found under email: ${USER_EMAIL}.</td></tr>`;
+                    return;
+                }
+
+                myReservations.sort((a, b) => b.id - a.id);
+
+                myReservations.forEach(res => {
+                    const row = document.createElement('tr');
+                    const isCompleted = res.status.toLowerCase() === 'completed';
+                    const statusStyle = isCompleted 
+                        ? 'background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 8px; border-radius: 4px; font-weight: 600;' 
+                        : 'background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 4px 8px; border-radius: 4px; font-weight: 600;';
+
+                    let actionHtml = '-';
+                    if (!isCompleted) {
+                        actionHtml = `
+                            <button onclick="cancelMyReservation(${res.id}, ${res.parkingSpot ? res.parkingSpot.id : 0})" style="background-color: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight:600;">
+                                <i class="fas fa-times"></i> Release
+                            </button>
+                        `;
+                    }
+
+                    let spotCategory = '4W';
+                    if (res.parkingSpot) {
+                        if (res.parkingSpot.type === 'vip') spotCategory = 'VIP Owner';
+                        else if (res.parkingSpot.id === 3 || res.parkingSpot.id === 6) spotCategory = '2W';
+                    }
+                    const spotName = res.parkingSpot ? `Slot #${res.parkingSpot.id} (${spotCategory})` : 'N/A';
+
+                    row.innerHTML = `
+                        <td><strong>#${res.id}</strong></td>
+                        <td><span style="color: #6366f1; font-weight: 500;">${spotName}</span></td>
+                        <td><code>${res.vehicleNumber}</code></td>
+                        <td>${res.duration}h</td>
+                        <td><strong>₹${res.revenue.toFixed(0)}</strong></td>
+                        <td><span style="${statusStyle}">${res.status.toUpperCase()}</span></td>
+                        <td>${actionHtml}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Profile reservations fetch error:", error);
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 2rem;">Error sync list. Please verify Java backend is running.</td></tr>`;
+            }
+        }
+
+        async function cancelMyReservation(id, spotId) {
+            if (!confirm(`Are you sure you want to release Spot #${spotId}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/reservations/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to cancel reservation");
+                }
+
+                fetchUserProfileReservations();
+            } catch (error) {
+                console.error(error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener("DOMContentLoaded", initProfile);
+    </script>
+</body>
+</html>

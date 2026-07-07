@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Banking Gateway Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #f1f5f9;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #1e3a8a;
+            --primary-hover: #172554;
+            --success: #15803d;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gateway-container {
+            max-width: 500px;
+            width: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .bank-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .bank-logo-text {
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gateway-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .txn-info-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        .txn-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .txn-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-cancel {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        .btn-cancel:hover {
+            color: #ef4444;
+        }
+
+        /* Processing overlay inside card */
+        #gateway-loader {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+
+        .spinner {
+            font-size: 2.5rem;
+            color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Padlock security footer */
+        .security-footer {
+            margin-top: 1.5rem;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="gateway-container">
+        <!-- Secure Header -->
+        <header class="bank-header">
+            <div class="bank-logo-text" id="header-bank-logo">
+                <i class="fas fa-university"></i> <span id="header-bank-name">Secure Gateway</span>
+            </div>
+            <div style="font-size: 0.8rem; background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 4px; font-weight: 500;">
+                Demo Sandbox
+            </div>
+        </header>
+
+        <!-- Main Form Card -->
+        <main class="gateway-card">
+            <div id="gateway-content">
+                <div style="font-size: 0.85rem; color: var(--success); font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                    <i class="fas fa-lock"></i> SSL Secured 256-bit Connection
+                </div>
+
+                <!-- Txn Info Summary -->
+                <div class="txn-info-box">
+                    <div class="txn-row">
+                        <span style="color: var(--text-muted);">Merchant</span>
+                        <span style="font-weight: 600;">CommuniPark Parking Systems</span>
+                    </div>
+                    <div class="txn-row">
+                        <span style="color: var(--text-muted);">Amount</span>
+                        <span style="font-weight: 700; color: var(--success);" id="txn-amount">₹0.00</span>
+                    </div>
+                    <div class="txn-row">
+                        <span style="color: var(--text-muted);">Reservation ID</span>
+                        <span style="font-weight: 600;" id="txn-res-id">-</span>
+                    </div>
+                    <div class="txn-row">
+                        <span style="color: var(--text-muted);">Payment Method</span>
+                        <span style="font-weight: 600;" id="txn-method">-</span>
+                    </div>
+                </div>
+
+                <!-- Dynamic Forms based on method -->
+                <form id="nb-form" style="display: none;" onsubmit="handleAuthorize(event)">
+                    <h3 style="margin-top: 0; text-align: left; font-size: 1.1rem; font-weight: 700;">Netbanking Login</h3>
+                    <div class="form-group">
+                        <label>Customer ID / User ID</label>
+                        <input type="text" required class="form-input" placeholder="Enter Netbanking User ID" id="nb-user-id">
+                    </div>
+                    <div class="form-group">
+                        <label>IPIN / Password</label>
+                        <input type="password" required class="form-input" placeholder="Enter Password" id="nb-pass">
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-shield-alt"></i> Login & Authorize
+                    </button>
+                </form>
+
+                <form id="card-form" style="display: none;" onsubmit="handleAuthorize(event)">
+                    <h3 style="margin-top: 0; text-align: left; font-size: 1.1rem; font-weight: 700;">3D Secure OTP Authentication</h3>
+                    <p style="text-align: left; font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 1rem;">
+                        Enter the 6-digit One Time Password (OTP) sent to your registered mobile number ending in ****.
+                    </p>
+                    <div class="form-group">
+                        <label>One-Time Password (OTP)</label>
+                        <input type="text" required class="form-input" placeholder="Enter 6-Digit OTP" maxlength="6" id="card-otp" style="text-align: center; letter-spacing: 4px; font-weight: bold; font-size: 1.25rem;">
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-shield-alt"></i> Verify & Submit
+                    </button>
+                </form>
+
+                <form id="upi-form" style="display: none;" onsubmit="handleAuthorize(event)">
+                    <h3 style="margin-top: 0; text-align: left; font-size: 1.1rem; font-weight: 700;">App Payment Verification</h3>
+                    <p style="text-align: left; font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 1.5rem;">
+                        Open your UPI application (PhonePe, GPay, Paytm) on your phone and approve the payment request of amount listed above.
+                    </p>
+                    <button type="submit" class="btn-submit" style="background: var(--success);">
+                        <i class="fas fa-check-circle"></i> Yes, I have Approved payment
+                    </button>
+                </form>
+
+                <a href="#" onclick="cancelTransaction()" class="btn-cancel">Cancel & Return to CommuniPark</a>
+            </div>
+
+            <!-- Loader Screen -->
+            <div id="gateway-loader">
+                <i class="fas fa-circle-notch spinner"></i>
+                <h3 id="loader-title" style="margin: 0 0 0.5rem 0; font-weight: 700;">Contacting Bank...</h3>
+                <p id="loader-desc" style="color: var(--text-muted); font-size: 0.85rem; max-width: 250px; margin: 0; line-height: 1.4;">Settling transaction secure channels</p>
+            </div>
+        </main>
+
+        <!-- Security footer -->
+        <div class="security-footer">
+            <i class="fas fa-shield-alt" style="color: var(--success);"></i>
+            Secured by Verified by Visa &amp; Mastercard Identity Check
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : `${window.location.origin}/api`;
+        let resId = '';
+        let token = '';
+        let method = '';
+        let bank = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            resId = params.get('resId');
+            token = params.get('token');
+            method = params.get('method') || 'card';
+            bank = params.get('bank') || 'HDFC Bank';
+
+            if (!resId || !token) {
+                alert('Invalid session details.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Customize Bank Name in Header
+            document.getElementById('header-bank-name').textContent = bank;
+            if (bank.toLowerCase().includes('sbi') || bank.toLowerCase().includes('state bank')) {
+                document.querySelector('.bank-header').style.backgroundColor = '#00a2e8';
+            } else if (bank.toLowerCase().includes('axis')) {
+                document.querySelector('.bank-header').style.backgroundColor = '#990033';
+            } else if (bank.toLowerCase().includes('icici')) {
+                document.querySelector('.bank-header').style.backgroundColor = '#ff6600';
+            } else {
+                document.querySelector('.bank-header').style.backgroundColor = '#1e3a8a';
+            }
+
+            fetchDetails();
+        });
+
+        async function fetchDetails() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/reservations`);
+                const all = await response.json();
+                const reservation = all.find(r => r.id == resId);
+                if (!reservation) {
+                    alert('Reservation not found');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                document.getElementById('txn-amount').textContent = '₹' + Math.round(reservation.revenue) + '.00';
+                document.getElementById('txn-res-id').textContent = '#' + reservation.id;
+                
+                // Show relevant form
+                if (method === 'netbanking') {
+                    document.getElementById('txn-method').textContent = 'Netbanking (' + bank + ')';
+                    document.getElementById('nb-form').style.display = 'block';
+                } else if (method === 'upi') {
+                    document.getElementById('txn-method').textContent = 'UPI (' + bank + ')';
+                    document.getElementById('upi-form').style.display = 'block';
+                } else {
+                    document.getElementById('txn-method').textContent = 'Credit/Debit Card (SecurePay)';
+                    document.getElementById('card-form').style.display = 'block';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function handleAuthorize(event) {
+            event.preventDefault();
+
+            // Hide content and show bank connection loader
+            document.getElementById('gateway-content').style.display = 'none';
+            const loader = document.getElementById('gateway-loader');
+            loader.style.display = 'flex';
+            
+            document.getElementById('loader-title').textContent = 'Verifying Authorization...';
+            document.getElementById('loader-desc').textContent = 'Confirming credentials and checking balances...';
+
+            setTimeout(async () => {
+                document.getElementById('loader-title').textContent = 'Settling Transaction...';
+                document.getElementById('loader-desc').textContent = 'Finalizing deposit with CommuniPark...';
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/payment/communipay/process`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: token })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok && data.status === 'PAID') {
+                        document.getElementById('loader-title').innerHTML = '<i class="fas fa-check-circle" style="color: var(--success); font-size: 3rem; margin-bottom:1rem;"></i> Authorized Successfully!';
+                        document.getElementById('loader-desc').textContent = 'Redirecting you back to CommuniPark...';
+                        
+                        setTimeout(() => {
+                            window.location.href = `payment.html?resId=${resId}&payment_success=true`;
+                        }, 1500);
+                    } else {
+                        alert('Authorization failed: ' + (data.error || 'Connection rejected by bank.'));
+                        resetForm();
+                    }
+                } catch (e) {
+                    alert('Banking gateway connection lost: ' + e.message);
+                    resetForm();
+                }
+            }, 1800);
+        }
+
+        function resetForm() {
+            document.getElementById('gateway-content').style.display = 'block';
+            document.getElementById('gateway-loader').style.display = 'none';
+            // Clear inputs
+            const otpInput = document.getElementById('card-otp');
+            if (otpInput) otpInput.value = '';
+        }
+
+        function cancelTransaction() {
+            if (confirm('Are you sure you want to cancel the secure banking connection?')) {
+                window.location.href = `payment.html?resId=${resId}`;
+            }
+        }
+    </script>
+</body>
+</html>
