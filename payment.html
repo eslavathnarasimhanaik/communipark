@@ -20,6 +20,10 @@
         if (window.API_BASE_URL.startsWith("%VITE_") || !window.API_BASE_URL) {
             window.API_BASE_URL = "http://localhost:8080/api";
         }
+        window.RAZORPAY_KEY_ID = "%VITE_RAZORPAY_KEY_ID%" || "";
+        if (window.RAZORPAY_KEY_ID.startsWith("%VITE_")) {
+            window.RAZORPAY_KEY_ID = "";
+        }
     </script>
 </head>
 <body>
@@ -1463,7 +1467,7 @@
             }
             
             const options = {
-                "key": rzpKey || "rzp_test_mockkey12345", 
+                "key": rzpKey || window.RAZORPAY_KEY_ID || "rzp_test_mockkey12345", 
                 "amount": Math.round(currentReservation.revenue * 100), 
                 "currency": "INR",
                 "name": "CommuniPark Systems",
