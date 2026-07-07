@@ -15,6 +15,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="s.css">
     <link rel="stylesheet" href="ra.css">
+    <script>
+        window.API_BASE_URL = "%VITE_API_URL%" || "http://localhost:8080/api";
+        if (window.API_BASE_URL.startsWith("%VITE_") || !window.API_BASE_URL) {
+            window.API_BASE_URL = "http://localhost:8080/api";
+        }
+    </script>
 </head>
 <body>
     <!-- Secure Admin Login Gate -->
@@ -174,7 +180,7 @@
     </div>
 
     <script>
-    const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : `${window.location.origin}/api`;
+    const API_BASE_URL = window.API_BASE_URL || 'http://localhost:8080/api';
     let userTypeChart = null;
     let vehicleChart = null;
     let pollingInterval = null;

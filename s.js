@@ -1,4 +1,4 @@
-const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : `${window.location.origin}/api`;
+const API_BASE_URL = window.API_BASE_URL || 'http://localhost:8080/api';
 let parkingSlots = [];
 let selectedSlot = null;
 

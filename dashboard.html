@@ -23,6 +23,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="s.css">
+    <script>
+        window.API_BASE_URL = "%VITE_API_URL%" || "http://localhost:8080/api";
+        if (window.API_BASE_URL.startsWith("%VITE_") || !window.API_BASE_URL) {
+            window.API_BASE_URL = "http://localhost:8080/api";
+        }
+    </script>
     <link rel="stylesheet" href="ra.css">
 </head>
 <body>

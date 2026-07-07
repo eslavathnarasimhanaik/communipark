@@ -8,6 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="s.css">
     <link rel="stylesheet" href="ra.css">
+    <script>
+        window.API_BASE_URL = "%VITE_API_URL%" || "http://localhost:8080/api";
+        if (window.API_BASE_URL.startsWith("%VITE_") || !window.API_BASE_URL) {
+            window.API_BASE_URL = "http://localhost:8080/api";
+        }
+    </script>
     <style>
         :root {
             --bg-primary: #0b0f19;
@@ -498,7 +504,7 @@
     </footer>
 
     <script>
-        const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : `${window.location.origin}/api`;
+        const API_BASE_URL = window.API_BASE_URL || 'http://localhost:8080/api';
         let resId = '';
         let token = '';
         let selectedNB = '';

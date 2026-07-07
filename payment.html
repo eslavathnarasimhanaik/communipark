@@ -15,6 +15,12 @@
     <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <!-- Razorpay Web SDK -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        window.API_BASE_URL = "%VITE_API_URL%" || "http://localhost:8080/api";
+        if (window.API_BASE_URL.startsWith("%VITE_") || !window.API_BASE_URL) {
+            window.API_BASE_URL = "http://localhost:8080/api";
+        }
+    </script>
 </head>
 <body>
     <nav class="navbar">
@@ -311,7 +317,7 @@
     </footer>
 
     <script>
-        const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : `${window.location.origin}/api`;
+        const API_BASE_URL = window.API_BASE_URL || 'http://localhost:8080/api';
         let currentReservation = null;
         let mockTxnId = '';
         let secretCode = '';
